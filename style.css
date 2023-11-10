@@ -39,7 +39,7 @@ header h1 {
   background: white;
 }
 
-.list__box div {
+.note__list div {
   display: flex;
   justify-content: center;
   font-size: 30px;

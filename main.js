@@ -1,12 +1,10 @@
-const input = document.querySelector("input");
-const addButton = document.querySelector(".save__button");
-const boxList = document.querySelector(".list__box");
+const textNote = document.querySelector("input");
+const saveButton = document.querySelector(".save__button");
+const noteList = document.querySelector(".note__list");
 
-// let taskIndex = 1;
-
-function saveNoteButton() {
+function saveNote() {
   const newDiv = document.createElement("div");
-  const text = input.value;
+  const text = textNote.value;
   if (text === "") return;
   newDiv.innerHTML = `
   <p class="number"> </p>
@@ -15,31 +13,63 @@ function saveNoteButton() {
   <button class="checked">V</button>
 `;
 
-  boxList.appendChild(newDiv);
-  input.value = "";
-  // taskIndex++;
+  noteList.appendChild(newDiv);
+  textNote.value = "";
 
-  //checked task
+  //add to localstorage and add unique ID to div
+  const noteKey = Date.now().toString();
+  localStorage.setItem(noteKey, text);
+  newDiv.id = noteKey;
+
+  //checked task button
   const doneButton = newDiv.querySelector(".checked");
-  doneButton.addEventListener("click", doneNoteButton);
+  doneButton.addEventListener("click", doneNote);
 
-  //delete task
+  //delete task button
   const deleteButton = newDiv.querySelector(".delete");
-  deleteButton.addEventListener("click", deleteNoteButton);
+  deleteButton.addEventListener("click", deleteNote);
 }
 
-function deleteNoteButton(e) {
+function deleteNote(e) {
+  //delete from page
   const div = e.target.parentNode;
-  boxList.removeChild(div);
+  noteList.removeChild(div);
+  //delete from localstorage
+  const noteID = div.id;
+  localStorage.removeItem(noteID);
 
   //initial function recalculating index task
   // recaltulatingIndexTask();
   // boxList.childElementCount;
 }
 
-function doneNoteButton(e) {
+function doneNote(e) {
   const pText = e.target.parentNode.querySelector("p.text__input");
   pText.classList.toggle("done");
 }
 
-addButton.addEventListener("click", saveNoteButton);
+//initialization from localStorage
+function init() {
+  Object.keys(localStorage).forEach((keyNote) => {
+    const textNote = localStorage.getItem(keyNote);
+    console.log(keyNote);
+    const newDiv = document.createElement("div");
+    newDiv.innerHTML = `
+    <p class="number"> </p>
+    <p class="text__input">${textNote}</p>
+    <button class="delete">Usuń</button>
+    <button class="checked">V</button>
+  `;
+    const doneButton = newDiv.querySelector(".checked");
+    doneButton.addEventListener("click", doneNote);
+
+    const deleteButton = newDiv.querySelector(".delete");
+    deleteButton.addEventListener("click", deleteNote);
+    noteList.appendChild(newDiv);
+    newDiv.id = keyNote;
+  });
+}
+
+init();
+
+saveButton.addEventListener("click", saveNote);
